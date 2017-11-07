@@ -18,7 +18,7 @@ public final class Minesweeper extends Application {
     private static final int ROWS = 16;
     private static final int COLUMS = 30;
     private static final int MINES = 99;
-    public static final int SQUARE_SIZE = 25;
+    public static final int SQUARE_SIZE = 30;
 
     private static MineField field = null;
     private static GridPane grid = null;

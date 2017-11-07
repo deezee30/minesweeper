@@ -140,13 +140,13 @@ public final class MineButton {
             if (flagged) {
                 button.setBackground(MINE_WRONG_BACKGROUND);
             } else {
+                button.setBackground(null);
+
                 if (number > 0) {
                     button.setText(String.valueOf(number));
-                    button.setFont(Font.font("Consolas", FontWeight.EXTRA_BOLD, -1));
+                    button.setFont(Font.font("Consolas", FontWeight.EXTRA_BOLD, 14));
                     button.setTextFill(getColor());
                 }
-
-                button.setBackground(null);
             }
 
             MineField field = Minesweeper.getField();
