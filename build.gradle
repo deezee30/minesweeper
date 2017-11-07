@@ -1,0 +1,25 @@
+group 'com.maulss'
+version '1.0-SNAPSHOT'
+
+buildscript {
+    dependencies {
+        classpath group: 'de.dynamicfiles.projects.gradle.plugins', name: 'javafx-gradle-plugin', version: '8.8.2'
+    }
+    repositories {
+        jcenter()
+    }
+}
+
+apply plugin: 'java'
+
+repositories {
+    jcenter()
+}
+
+apply plugin: 'javafx-gradle-plugin'
+
+jfx {
+    mainClass = 'com.maulss.minesweeper.Minesweeper'
+    vendor = 'Minesweeper'
+    jfxMainAppJarName = "Minesweeper.jar"
+}
