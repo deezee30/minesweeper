@@ -48,6 +48,8 @@ public final class Minesweeper extends Application {
         flags.setFont(Font.font("Courier New", FontWeight.EXTRA_BOLD, 20));
         flags.setTextFill(Color.ORANGERED);
         flags.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+        flags.setMinWidth(60);
+        flags.setAlignment(Pos.CENTER);
         topBox.getChildren().add(flags);
 
         // Top middle (face)
@@ -61,6 +63,8 @@ public final class Minesweeper extends Application {
         time.setFont(Font.font("Courier New", FontWeight.EXTRA_BOLD, 20));
         time.setTextFill(Color.ORANGERED);
         time.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+        time.setMinWidth(60);
+        time.setAlignment(Pos.CENTER);
         topBox.getChildren().add(time);
 
         grid = new GridPane();
