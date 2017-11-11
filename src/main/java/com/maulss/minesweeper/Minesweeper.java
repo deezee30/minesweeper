@@ -5,12 +5,16 @@
 package com.maulss.minesweeper;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
 public final class Minesweeper extends Application {
@@ -20,21 +24,44 @@ public final class Minesweeper extends Application {
     private static final int MINES = 99;
     public static final int SQUARE_SIZE = 30;
 
-    private static MineField field = null;
-    private static GridPane grid = null;
-    private static Button face = new Button();
+    private GridPane grid = null;
+    private MineGame game = null;
+
+    private Label flags = new Label();
+    private Button face = new Button();
+    private Label time = new Label();
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(final Stage primaryStage) throws Exception {
         StackPane root = new StackPane();
 
         VBox box = new VBox(40);
         box.setAlignment(Pos.BOTTOM_CENTER);
 
         // Top section
+        HBox topBox = new HBox(250);
+        topBox.setAlignment(Pos.BOTTOM_CENTER);
+
+        // Top left (flags left)
+        flags = new Label(String.valueOf(MINES));
+        flags.setPadding(new Insets(10d));
+        flags.setFont(Font.font("Courier New", FontWeight.EXTRA_BOLD, 20));
+        flags.setTextFill(Color.ORANGERED);
+        flags.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+        topBox.getChildren().add(flags);
+
+        // Top middle (face)
         face.setMaxSize(48, 48);
         face.setMinSize(48, 48);
         face.setOnMouseClicked(event -> newGame());
+        topBox.getChildren().add(face);
+
+        // Top right (time)
+        time.setPadding(new Insets(10d));
+        time.setFont(Font.font("Courier New", FontWeight.EXTRA_BOLD, 20));
+        time.setTextFill(Color.ORANGERED);
+        time.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
+        topBox.getChildren().add(time);
 
         grid = new GridPane();
         StackPane.setAlignment(grid, Pos.BOTTOM_CENTER);
@@ -43,14 +70,12 @@ public final class Minesweeper extends Application {
 
         newGame();
 
-        box.getChildren().add(face);
+        box.getChildren().add(topBox);
         box.getChildren().add(grid);
 
         root.getChildren().add(box);
 
         Scene scene = new Scene(root, SQUARE_SIZE * COLUMS, SQUARE_SIZE * ROWS + 120);
-
-        scene.getStylesheets().add("style.css");
 
         primaryStage.setTitle("Minesweeper");
         primaryStage.setResizable(false);
@@ -58,32 +83,32 @@ public final class Minesweeper extends Application {
         primaryStage.show();
     }
 
-    public static MineField getField() {
-        if (field == null)
-            throw new IllegalStateException("Minefield hasn't been set up yet");
-        return field;
+    @Override
+    public void stop() throws Exception {
+        if (game != null) {
+            game.finish();
+        }
     }
 
-    public static void newGame() {
-        grid.getChildren().clear();
-        field = new MineField(grid, COLUMS, ROWS, SQUARE_SIZE, MINES);
-        face.setBackground(MineButtons.getAutoBackground(MineButtons.getImage("face_game.png")));
+    public void newGame() {
+        if (game != null)
+            game.finish();
+        game = new MineGame(this, grid, COLUMS, ROWS, SQUARE_SIZE, MINES);
     }
 
-    public static void win() {
-        face.setBackground(MineButtons.getAutoBackground(MineButtons.getImage("face_win.png")));
+    public void setTime(final int seconds) {
+        Platform.runLater(() -> time.setText(String.valueOf(seconds)));
     }
 
-    public static void gameOver() {
-        field.showGrid();
-        face.setBackground(MineButtons.getAutoBackground(MineButtons.getImage("face_lose.png")));
+    public void setFlags(final int flags) {
+        this.flags.setText(String.valueOf(flags));
     }
 
-    public static Button getFace() {
-        return face;
+    public void setFace(final String resource) {
+        face.setBackground(MineButtons.getAutoBackground(MineButtons.getImage(resource)));
     }
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         // let JavaFX handle the launch
         launch(args);
     }

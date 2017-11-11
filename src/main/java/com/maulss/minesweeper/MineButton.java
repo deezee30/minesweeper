@@ -13,6 +13,7 @@ import javafx.scene.text.FontWeight;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class MineButton {
 
@@ -27,8 +28,7 @@ public final class MineButton {
     private static final Background FLAG_BACKGROUND = MineButtons.getAutoBackground(FLAG);
     private static final Background DEFAULT_BACKGROUND = new Background(new BackgroundFill(Color.WHITE, null, null));
 
-    private static MineButton lastClicked = null;
-
+    private final MineField field;
     private final Button button;
     private final int x;
     private final int y;
@@ -37,9 +37,11 @@ public final class MineButton {
     private boolean visible = false;
     private Integer number = null;
 
-    public MineButton(final int xPos,
+    public MineButton(final MineField field,
+                      final int xPos,
                       final int yPos,
                       final int size) {
+        this.field = Objects.requireNonNull(field, "field");
         this.x = xPos;
         this.y = yPos;
 
@@ -51,15 +53,17 @@ public final class MineButton {
         button.setMaxSize(size, size);
         button.setOnMouseClicked(event -> {
             if (visible) return;
-            lastClicked = this;
             switch (event.getButton()) {
                 default: return;
                 case PRIMARY:
-                    if (mine && !flagged) {
-                        Minesweeper.gameOver();
+                	if (flagged) return;
+                	if (field.getLastClick() == null) {
+                        field.setLastClick(this);
+                	    field.getGame().start();
                     } else {
-                        activate();
+                        field.setLastClick(this);
                     }
+                    activate();
                     break;
                 case SECONDARY:
                     setFlagged(!isFlagged());
@@ -119,6 +123,7 @@ public final class MineButton {
 
     public void setFlagged(final boolean flagged) {
         this.flagged = flagged;
+        field.getGame().adjustFlagsLeft(flagged ? -1 : 1);
         button.setBackground(flagged ? FLAG_BACKGROUND : DEFAULT_BACKGROUND);
     }
 
@@ -131,13 +136,14 @@ public final class MineButton {
         visible = true;
 
         if (mine) {
-            if (equals(lastClicked)) {
+            if (equals(field.getLastClick())) {
+                field.getGame().lose();
                 button.setBackground(MINE_SOURCE_BACKGROUND);
             } else if (!flagged) {
                 button.setBackground(MINE_BACKGROUND);
             }
         } else {
-            if (flagged) {
+            if (flagged && field.getGame().hasStarted()) {
                 button.setBackground(MINE_WRONG_BACKGROUND);
             } else {
                 button.setBackground(null);
@@ -149,10 +155,8 @@ public final class MineButton {
                 }
             }
 
-            MineField field = Minesweeper.getField();
-
             // expand region if there are no adjacent mines
-            List<MineButton> adjacents = getAdjacent(field);
+            List<MineButton> adjacents = getAdjacent();
             boolean activate = true;
             for (MineButton adjacent : adjacents) {
                 if (adjacent.mine) {
@@ -176,15 +180,16 @@ public final class MineButton {
                     }
                 }
             }
-            if (won) Minesweeper.win();
+            if (won) field.getGame().win();
         }
     }
 
-    public List<MineButton> getAdjacent(final MineField field) {
+    public List<MineButton> getAdjacent() {
         int width = field.getWidth();
         int height = field.getHeight();
         MineButton[][] grid = field.getGrid();
 
+        //       | Position ---- | x-bound ------ | y-bound ------------ | x -- | y --
         MineButton top          = (                 y > 0         ) ? grid[x    ][y - 1] : null;
         MineButton topRight     = (x < width - 1 && y > 0         ) ? grid[x + 1][y - 1] : null;
         MineButton right        = (x < width - 1                  ) ? grid[x + 1][y    ] : null;
@@ -208,9 +213,9 @@ public final class MineButton {
         return adjacent;
     }
 
-    public int getAdjacentMines(final MineField field) {
+    public int getAdjacentMines() {
         int adjacent = 0;
-        for (MineButton button : getAdjacent(field))
+        for (MineButton button : getAdjacent())
             if (button.isMine())
                 adjacent++;
         return adjacent;
