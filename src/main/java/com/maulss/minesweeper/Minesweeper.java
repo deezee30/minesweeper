@@ -19,10 +19,7 @@ import javafx.stage.Stage;
 
 public final class Minesweeper extends Application {
 
-    private static final int ROWS = 16;
-    private static final int COLUMS = 30;
-    private static final int MINES = 99;
-    public static final int SQUARE_SIZE = 30;
+    private static final GameSettings SETTINGS = GameSettings.EXPERT;
 
     private GridPane grid = null;
     private MineGame game = null;
@@ -35,7 +32,7 @@ public final class Minesweeper extends Application {
     public void start(final Stage primaryStage) throws Exception {
         StackPane root = new StackPane();
 
-        VBox box = new VBox(40);
+        VBox box = new VBox(30);
         box.setAlignment(Pos.BOTTOM_CENTER);
 
         // Top section
@@ -43,9 +40,9 @@ public final class Minesweeper extends Application {
         topBox.setAlignment(Pos.BOTTOM_CENTER);
 
         // Top left (flags left)
-        flags = new Label(String.valueOf(MINES));
+        flags = new Label(String.valueOf(SETTINGS.getMines()));
         flags.setPadding(new Insets(10d));
-        flags.setFont(Font.font("Courier New", FontWeight.EXTRA_BOLD, 20));
+        flags.setFont(Font.font("Courier New", FontWeight.BLACK, 20));
         flags.setTextFill(Color.ORANGERED);
         flags.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
         flags.setMinWidth(60);
@@ -60,7 +57,7 @@ public final class Minesweeper extends Application {
 
         // Top right (time)
         time.setPadding(new Insets(10d));
-        time.setFont(Font.font("Courier New", FontWeight.EXTRA_BOLD, 20));
+        time.setFont(Font.font("Courier New", FontWeight.BLACK, 20));
         time.setTextFill(Color.ORANGERED);
         time.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
         time.setMinWidth(60);
@@ -79,9 +76,13 @@ public final class Minesweeper extends Application {
 
         root.getChildren().add(box);
 
-        Scene scene = new Scene(root, SQUARE_SIZE * COLUMS, SQUARE_SIZE * ROWS + 120);
+        Scene scene = new Scene(
+                root,
+                SETTINGS.getSquareSize() * SETTINGS.getColumns(),
+                SETTINGS.getSquareSize() * SETTINGS.getRows() + 100
+        );
 
-        primaryStage.setTitle("Minesweeper");
+        primaryStage.setTitle("Mineweeper");
         primaryStage.setResizable(false);
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -97,7 +98,7 @@ public final class Minesweeper extends Application {
     public void newGame() {
         if (game != null)
             game.finish();
-        game = new MineGame(this, grid, COLUMS, ROWS, SQUARE_SIZE, MINES);
+        game = new MineGame(this, grid, SETTINGS);
     }
 
     public void setTime(final int seconds) {

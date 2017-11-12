@@ -4,6 +4,7 @@
 
 package com.maulss.minesweeper;
 
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
@@ -150,7 +151,8 @@ public final class MineButton {
 
                 if (number > 0) {
                     button.setText(String.valueOf(number));
-                    button.setFont(Font.font("Consolas", FontWeight.EXTRA_BOLD, 14));
+                    button.setPadding(new Insets(0));
+                    button.setFont(Font.font("Courier New", FontWeight.BLACK, 18));
                     button.setTextFill(getColor());
                 }
             }
@@ -219,5 +221,38 @@ public final class MineButton {
             if (button.isMine())
                 adjacent++;
         return adjacent;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MineButton that = (MineButton) o;
+        return x == that.x &&
+                y == that.y &&
+                flagged == that.flagged &&
+                mine == that.mine &&
+                visible == that.visible &&
+                Objects.equals(field, that.field) &&
+                Objects.equals(button, that.button) &&
+                Objects.equals(number, that.number);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(field, button, x, y, flagged, mine, visible, number);
+    }
+
+    @Override
+    public String toString() {
+        return "MineButton{" + "field=" + field
+                + ", button=" + button
+                + ", x=" + x
+                + ", y=" + y
+                + ", flagged=" + flagged
+                + ", mine=" + mine
+                + ", visible=" + visible
+                + ", number=" + number
+                + '}';
     }
 }

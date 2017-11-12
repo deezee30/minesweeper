@@ -7,16 +7,18 @@ package com.maulss.minesweeper;
 
 import javafx.scene.layout.GridPane;
 
-import java.util.Objects;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import static java.util.Objects.requireNonNull;
 
 public final class MineGame {
 
     private boolean started = false;
     private boolean finished = false;
     private final Minesweeper minesweeper;
+    private final GameSettings settings;
     private final MineField field;
     private final GridPane pane;
     private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
@@ -25,21 +27,16 @@ public final class MineGame {
 
     public MineGame(final Minesweeper minesweeper,
                     final GridPane pane,
-                    final int width,
-                    final int height,
-                    final int size,
-                    final int mines) {
-        if (mines >= width * height - 9)
-            throw new IllegalArgumentException("Too many mines!");
-
-        this.minesweeper = Objects.requireNonNull(minesweeper, "minesweeper");
-        this.pane = Objects.requireNonNull(pane, "pane");
+                    final GameSettings settings) {
+        this.minesweeper = requireNonNull(minesweeper, "minesweeper");
+        this.settings = requireNonNull(settings, "settings");
+        this.pane = requireNonNull(pane, "pane");
 
         pane.getChildren().clear();
-        minesweeper.setFlags(flagsLeft = mines);
+        minesweeper.setFlags(flagsLeft = settings.getMines());
         minesweeper.setTime(0);
 
-        field = new MineField(this, width, height, size, mines);
+        field = new MineField(this, settings);
 
         minesweeper.setFace("face_game.png");
     }
@@ -81,6 +78,10 @@ public final class MineGame {
 
     public Minesweeper getMinesweeper() {
         return minesweeper;
+    }
+
+    public GameSettings getSettings() {
+        return settings;
     }
 
     public MineField getField() {

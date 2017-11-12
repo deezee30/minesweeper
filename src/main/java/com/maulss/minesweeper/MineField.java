@@ -25,15 +25,12 @@ public final class MineField {
     private final List<MineButton> possibleMines;
 
     public MineField(final MineGame game,
-                     final int width,
-                     final int height,
-                     final int size,
-                     final int mines) {
+                     final GameSettings settings) {
         this.game = Objects.requireNonNull(game, "game");
 
-        this.width = width;
-        this.height = height;
-        this.mines = mines;
+        this.width = settings.getColumns();
+        this.height = settings.getRows();
+        this.mines = settings.getMines();
 
         // temporary storage for assigning mines
         possibleMines = new ArrayList<>(width * height);
@@ -42,7 +39,7 @@ public final class MineField {
         // assign each button their own position
         for (int x = 0; x < width; x++) {
             for (int y = 0; y < height; y++) {
-                MineButton button = new MineButton(this, x, y, size);
+                MineButton button = new MineButton(this, x, y, settings.getSquareSize());
                 grid[x][y] = button;
                 possibleMines.add(button);
                 game.getPane().add(button.getButton(), x, y);
@@ -94,9 +91,6 @@ public final class MineField {
         }
 
         generated = true;
-
-        // debug: show grid
-        // showGrid();
     }
 
     public boolean isGenerated() {
