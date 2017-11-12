@@ -136,15 +136,16 @@ public final class MineButton {
         if (visible) return;
         visible = true;
 
+        MineGame game = field.getGame();
         if (mine) {
             if (equals(field.getLastClick())) {
-                field.getGame().lose();
+                game.lose();
                 button.setBackground(MINE_SOURCE_BACKGROUND);
             } else if (!flagged) {
                 button.setBackground(MINE_BACKGROUND);
             }
         } else {
-            if (flagged && field.getGame().hasStarted()) {
+            if (flagged && game.hasStarted() && equals(field.getLastClick())) {
                 button.setBackground(MINE_WRONG_BACKGROUND);
             } else {
                 button.setBackground(null);
@@ -182,7 +183,7 @@ public final class MineButton {
                     }
                 }
             }
-            if (won) field.getGame().win();
+            if (won) game.win();
         }
     }
 
