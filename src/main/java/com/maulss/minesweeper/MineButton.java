@@ -145,7 +145,7 @@ public final class MineButton {
                 button.setBackground(MINE_BACKGROUND);
             }
         } else {
-            if (flagged && game.hasStarted() && equals(field.getLastClick())) {
+            if (flagged && game.hasStarted()) {
                 button.setBackground(MINE_WRONG_BACKGROUND);
             } else {
                 button.setBackground(null);
