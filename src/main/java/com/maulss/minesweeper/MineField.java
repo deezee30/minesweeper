@@ -53,9 +53,7 @@ public final class MineField {
         // first of all, remove the possibility of a mine being
         // generated at the clicked button or any button adjacent to it
         possibleMines.remove(lastClick);
-        for (MineButton button : lastClick.getAdjacent()) {
-            possibleMines.remove(button);
-        }
+        possibleMines.removeAll(lastClick.getAdjacent());
 
         int length = possibleMines.size();
 

@@ -4,6 +4,8 @@
 
 package com.maulss.minesweeper;
 
+import javafx.beans.NamedArg;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
@@ -103,11 +105,12 @@ public final class GameSettings implements Serializable {
                                                  final Integer rows) {
         if (columns == null || rows == null || columns < 9 || rows < 9)
             return Optional.empty();
-        return Optional.of(getMineDensity((columns) * (rows)));
+        return Optional.of(suggestMines((columns) * (rows) - 8));
     }
 
-    public static int getMineDensity(final int maxCells) {
-        // y = 0.0003x^2 + 0.0591x + 3.9205
-        return (int) Math.floor(0.0003 * Math.pow(maxCells, 2) + 0.0591 * maxCells + 3.9205);
+    public static int suggestMines(@NamedArg("maxCells") final int x) {
+        // Polynomial equation for mine suggestion generated from line of best fit
+        // y = 10598.52 + (1.130322 - 10598.52)/(1 + (x/18173.86)^1.284253)
+        return (int) Math.round(10598.52 - 10597.39 / (1 + Math.pow((float) x / 18173.86, 1.284)));
     }
 }
