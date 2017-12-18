@@ -86,6 +86,7 @@ public final class Minesweeper extends Application {
 
         setup(settings);
 
+        primaryStage.getIcons().add(Resources.getImage("flag.png"));
         primaryStage.setTitle("Mineweeper");
         primaryStage.setResizable(false);
         primaryStage.setScene(new Scene(root));
