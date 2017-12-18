@@ -1,6 +1,5 @@
 /*
  * Part of minesweeper.
- * Made on 11/11/2017
  */
 
 package com.maulss.minesweeper;

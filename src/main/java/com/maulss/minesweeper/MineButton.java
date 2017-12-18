@@ -4,9 +4,9 @@
 
 package com.maulss.minesweeper;
 
+import com.maulss.minesweeper.ui.Resources;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -17,17 +17,6 @@ import java.util.List;
 import java.util.Objects;
 
 public final class MineButton {
-
-    private static final Image MINE = MineButtons.getImage("mine.png");
-    private static final Image MINE_WRONG = MineButtons.getImage("mine_wrong.png");
-    private static final Image MINE_SOURCE = MineButtons.getImage("mine_source.png");
-    private static final Image FLAG = MineButtons.getImage("flag.png");
-
-    private static final Background MINE_BACKGROUND = MineButtons.getAutoBackground(MINE);
-    private static final Background MINE_WRONG_BACKGROUND = MineButtons.getAutoBackground(MINE_WRONG);
-    private static final Background MINE_SOURCE_BACKGROUND = MineButtons.getAutoBackground(MINE_SOURCE);
-    private static final Background FLAG_BACKGROUND = MineButtons.getAutoBackground(FLAG);
-    private static final Background DEFAULT_BACKGROUND = new Background(new BackgroundFill(Color.WHITE, null, null));
 
     private final MineField field;
     private final Button button;
@@ -47,13 +36,13 @@ public final class MineButton {
         this.y = yPos;
 
         button = new Button();
-        button.setBackground(DEFAULT_BACKGROUND);
+        button.setBackground(Resources.DEFAULT_BG);
         BorderStroke stroke = new BorderStroke(Color.LIGHTGRAY, BorderStrokeStyle.SOLID, null, BorderStroke.THIN);
         button.setBorder(new Border(stroke, stroke, stroke, stroke));
         button.setMinSize(size, size);
         button.setMaxSize(size, size);
         button.setOnMouseClicked(event -> {
-            if (visible) return;
+            if (field.getGame().hasFinished() || visible) return;
             switch (event.getButton()) {
                 default: return;
                 case PRIMARY:
@@ -125,7 +114,7 @@ public final class MineButton {
     public void setFlagged(final boolean flagged) {
         this.flagged = flagged;
         field.getGame().adjustFlagsLeft(flagged ? -1 : 1);
-        button.setBackground(flagged ? FLAG_BACKGROUND : DEFAULT_BACKGROUND);
+        button.setBackground(flagged ? Resources.FLAG : Resources.DEFAULT_BG);
     }
 
     public boolean isFlagged() {
@@ -140,13 +129,13 @@ public final class MineButton {
         if (mine) {
             if (equals(field.getLastClick())) {
                 game.lose();
-                button.setBackground(MINE_SOURCE_BACKGROUND);
+                button.setBackground(Resources.MINE_SOURCE);
             } else if (!flagged) {
-                button.setBackground(MINE_BACKGROUND);
+                button.setBackground(Resources.MINE);
             }
         } else {
-            if (flagged && game.hasStarted()) {
-                button.setBackground(MINE_WRONG_BACKGROUND);
+            if (flagged && game.hasFinished()) {
+                button.setBackground(Resources.MINE_WRONG);
             } else {
                 button.setBackground(null);
 

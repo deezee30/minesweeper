@@ -4,13 +4,14 @@
 
 package com.maulss.minesweeper;
 
+import com.maulss.minesweeper.ui.MineMenuBar;
+import com.maulss.minesweeper.ui.Resources;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
@@ -19,29 +20,30 @@ import javafx.stage.Stage;
 
 public final class Minesweeper extends Application {
 
-    private static final GameSettings SETTINGS = GameSettings.EXPERT;
-
+    private Stage primaryStage = null;
+    private final StackPane root = new StackPane();
     private GridPane grid = null;
     private MineGame game = null;
+    private GameSettings settings = GameSettings.EXPERT;
 
+    private HBox topBox = new HBox();
     private Label flags = new Label();
     private Button face = new Button();
     private Label time = new Label();
 
     @Override
     public void start(final Stage primaryStage) throws Exception {
-        StackPane root = new StackPane();
-
+        this.primaryStage = primaryStage;
         VBox box = new VBox(30);
-        box.setAlignment(Pos.BOTTOM_CENTER);
+
+        MenuBar menu = new MineMenuBar(this);
 
         // Top section
-        HBox topBox = new HBox(250);
         topBox.setAlignment(Pos.BOTTOM_CENTER);
 
         // Top left (flags left)
-        flags = new Label(String.valueOf(SETTINGS.getMines()));
-        flags.setPadding(new Insets(10d));
+        flags = new Label(String.valueOf(settings.getMines()));
+        flags.setPadding(new Insets(10));
         flags.setFont(Font.font("Courier New", FontWeight.BLACK, 20));
         flags.setTextFill(Color.ORANGERED);
         flags.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
@@ -56,7 +58,7 @@ public final class Minesweeper extends Application {
         topBox.getChildren().add(face);
 
         // Top right (time)
-        time.setPadding(new Insets(10d));
+        time.setPadding(new Insets(10));
         time.setFont(Font.font("Courier New", FontWeight.BLACK, 20));
         time.setTextFill(Color.ORANGERED);
         time.setBackground(new Background(new BackgroundFill(Color.BLACK, null, null)));
@@ -69,36 +71,40 @@ public final class Minesweeper extends Application {
         grid.setAlignment(Pos.BOTTOM_CENTER);
         grid.setPadding(new Insets(5));
 
-        newGame();
-
+        box.getChildren().add(menu);
         box.getChildren().add(topBox);
         box.getChildren().add(grid);
 
-        root.getChildren().add(box);
+        ScrollPane scrollPane = new ScrollPane();
+        scrollPane.setHbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setVbarPolicy(ScrollPane.ScrollBarPolicy.AS_NEEDED);
+        scrollPane.setMaxWidth(1500);
+        scrollPane.setMaxHeight(1000);
+        scrollPane.setContent(box);
 
-        Scene scene = new Scene(
-                root,
-                SETTINGS.getSquareSize() * SETTINGS.getColumns(),
-                SETTINGS.getSquareSize() * SETTINGS.getRows() + 100
-        );
+        root.getChildren().add(scrollPane);
+
+        setup(settings);
 
         primaryStage.setTitle("Mineweeper");
         primaryStage.setResizable(false);
-        primaryStage.setScene(scene);
+        primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 
-    @Override
-    public void stop() throws Exception {
-        if (game != null) {
-            game.finish();
-        }
+    public void setup(final GameSettings settings) {
+        this.settings = settings;
+        topBox.setSpacing((2.5f * settings.getColumns() * settings.getSquareSize()) / 10f);
+
+        newGame();
+
+        primaryStage.sizeToScene();
     }
 
     public void newGame() {
         if (game != null)
             game.finish();
-        game = new MineGame(this, grid, SETTINGS);
+        game = new MineGame(this, grid, settings);
     }
 
     public void setTime(final int seconds) {
@@ -109,8 +115,8 @@ public final class Minesweeper extends Application {
         this.flags.setText(String.valueOf(flags));
     }
 
-    public void setFace(final String resource) {
-        face.setBackground(MineButtons.getAutoBackground(MineButtons.getImage(resource)));
+    public void setFace(final String faceResource) {
+        face.setBackground(Resources.getAutoBackground(Resources.getImage(faceResource)));
     }
 
     public static void main(final String[] args) {
