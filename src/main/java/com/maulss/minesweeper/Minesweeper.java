@@ -4,6 +4,7 @@
 
 package com.maulss.minesweeper;
 
+import com.maulss.minesweeper.stats.GameStats;
 import com.maulss.minesweeper.ui.MineMenuBar;
 import com.maulss.minesweeper.ui.Resources;
 import javafx.application.Application;
@@ -18,6 +19,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+
 public final class Minesweeper extends Application {
 
     private Stage primaryStage = null;
@@ -25,6 +29,7 @@ public final class Minesweeper extends Application {
     private GridPane grid = null;
     private MineGame game = null;
     private GameSettings settings = GameSettings.EXPERT;
+    private GameStats stats = null;
 
     private HBox topBox = new HBox();
     private Label flags = new Label();
@@ -108,7 +113,7 @@ public final class Minesweeper extends Application {
         game = new MineGame(this, grid, settings);
     }
 
-    public void setTime(final int seconds) {
+    public void setTime(final long seconds) {
         Platform.runLater(() -> time.setText(String.valueOf(seconds)));
     }
 
@@ -118,6 +123,41 @@ public final class Minesweeper extends Application {
 
     public void setFace(final String faceResource) {
         face.setBackground(Resources.getAutoBackground(Resources.getImage(faceResource)));
+    }
+
+    public GameStats getStats() {
+        return stats == null
+                ? stats = GameStats.getInstance()
+                : stats;
+    }
+
+    public static void alertError(final Exception exception) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+
+        alert.setTitle(exception.getClass().getName());
+        alert.setHeaderText("An error has occurred!");
+        alert.setContentText(exception.getMessage());
+
+        StringWriter writer = new StringWriter();
+        PrintWriter print = new PrintWriter(writer);
+        exception.printStackTrace(print);
+
+        TextArea stacktrace = new TextArea(writer.toString());
+        stacktrace.setEditable(false);
+        stacktrace.setWrapText(true);
+
+        stacktrace.setMaxWidth(Double.MAX_VALUE);
+        stacktrace.setMaxHeight(Double.MAX_VALUE);
+        GridPane.setVgrow(stacktrace, Priority.ALWAYS);
+        GridPane.setHgrow(stacktrace, Priority.ALWAYS);
+
+        GridPane expContent = new GridPane();
+        expContent.setMaxWidth(Double.MAX_VALUE);
+        expContent.add(new Label("Stacktrace:"), 0, 0);
+        expContent.add(stacktrace, 0, 1);
+
+        alert.getDialogPane().setExpandableContent(expContent);
+        alert.showAndWait();
     }
 
     public static void main(final String[] args) {

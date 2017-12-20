@@ -4,8 +4,12 @@
 
 package com.maulss.minesweeper;
 
+import com.maulss.minesweeper.stats.ArchivedGame;
+import com.maulss.minesweeper.stats.ArchivedGames;
+import com.maulss.minesweeper.stats.GameStats;
 import javafx.scene.layout.GridPane;
 
+import java.io.IOException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -21,7 +25,7 @@ public final class MineGame {
     private final MineField field;
     private final GridPane pane;
     private final ScheduledExecutorService timer = Executors.newSingleThreadScheduledExecutor();
-    private int seconds = 0;
+    private long seconds = 0L;
     private int flagsLeft;
 
     public MineGame(final Minesweeper minesweeper,
@@ -33,7 +37,7 @@ public final class MineGame {
 
         pane.getChildren().clear();
         minesweeper.setFlags(flagsLeft = settings.getMines());
-        minesweeper.setTime(0);
+        minesweeper.setTime(0L);
 
         field = new MineField(this, settings);
 
@@ -49,9 +53,25 @@ public final class MineGame {
         timer.scheduleAtFixedRate(() -> minesweeper.setTime(seconds++), 0L, 1L, TimeUnit.SECONDS);
     }
 
-    public void win() {
+    public ArchivedGame win() {
         finish();
         minesweeper.setFace("face_win.png");
+
+        // Save game
+        ArchivedGame game = new ArchivedGame(this);
+        ArchivedGames games = minesweeper.getStats().getGames();
+
+        // update cache
+        games.add(game);
+
+        // update storage
+        try {
+            GameStats.writeJson(GameStats.GSON, games);
+        } catch (IOException e) {
+            Minesweeper.alertError(e);
+        }
+
+        return game;
     }
 
     public void lose() {
@@ -91,7 +111,7 @@ public final class MineGame {
         return pane;
     }
 
-    public int getTime() {
+    public long getTime() {
         return seconds;
     }
 

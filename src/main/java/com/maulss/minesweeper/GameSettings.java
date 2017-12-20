@@ -15,9 +15,10 @@ public final class GameSettings implements Serializable {
     private static final int SQUARE_SIZE = 30;
 
     public static final GameSettings
-            BEGINNER        = new GameSettings(9,   9, 10),
-            INTERMEDIATE    = new GameSettings(16, 16, 40),
-            EXPERT          = new GameSettings(30, 16, 99);
+            BEGINNER        = new GameSettings(9,   9,  10),
+            INTERMEDIATE    = new GameSettings(16, 16,  40),
+            EXPERT          = new GameSettings(30, 16,  99),
+            PROFESSIONAL    = new GameSettings(30, 24, 164);
 
     private final int columns;
     private final int rows;
@@ -58,6 +59,20 @@ public final class GameSettings implements Serializable {
 
     public float getMineDensity() {
         return ((float) mines) / ((float) columns * rows);
+    }
+
+    public String getDifficulty() {
+        float density = getMineDensity();
+        if (density > .25f)
+            return "Custom";
+        else if (density > PROFESSIONAL.getMineDensity())
+            return "Professional";
+        else if (density > EXPERT.getMineDensity())
+            return "Expert";
+        else if (density > INTERMEDIATE.getMineDensity())
+            return "Intermediate";
+        else
+            return "Beginner";
     }
 
     @Override

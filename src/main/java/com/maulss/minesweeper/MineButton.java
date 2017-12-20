@@ -163,16 +163,18 @@ public final class MineButton {
             }
 
             // check if the player won
-            boolean won = true;
-            for (int x = 0; x < field.getWidth(); x++) {
-                for (int y = 0; y < field.getHeight(); y++) {
-                    MineButton button = field.getGrid()[x][y];
-                    if (!button.visible && !button.mine) {
-                        won = false;
+            if (!game.hasFinished()) {
+                boolean won = true;
+                for (int x = 0; x < field.getWidth(); x++) {
+                    for (int y = 0; y < field.getHeight(); y++) {
+                        MineButton button = field.getGrid()[x][y];
+                        if (!button.visible && !button.mine) {
+                            won = false;
+                        }
                     }
                 }
+                if (won) game.win();
             }
-            if (won) game.win();
         }
     }
 
